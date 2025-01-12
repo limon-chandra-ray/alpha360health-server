@@ -39,7 +39,11 @@ async function run() {
             const result = await patientCollection.insertOne(patients)
             res.send(result)
         })
-
+        app.get('/api/patients',async(req,res)=>{
+        
+            const result=await patientCollection.find().toArray();
+            res.send(result);
+          })
         // appoinment add
         app.post("/api/appoinments",async(req,res)=>{
             const appoinment = req.body;
