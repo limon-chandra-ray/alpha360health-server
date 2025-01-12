@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 
 //mongodb
-const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const port = 5000;
 
@@ -51,110 +51,6 @@ async function run() {
             res.send(result)
         })
     
-    
-  //signup role of users
-//   app.post('/api/users', async(req,res)=>{
-//     const users= req.body;
-//     console.log(users)
-  
-//    const result = await usersCollection.insertOne(users);
-  
-//    res.send(result);
-//   })
-  
-  
-//   app.get('/api/users',async(req,res)=>{
-  
-//     const result=await usersCollection.find().toArray();
-//     res.send(result);
-//   })
-  
-  
-  
-  
-  //insert donation campign field 
-//   app.post('/api/donation-campaign', async(req,res)=>{
-//     const newcart = req.body;
-  
-//    const result = await donateCollection.insertOne(newcart);
-  
-//    res.send(result);
-//   })
-  
-//   app.get("/api/donation-campaign", async (req, res) => {
-//   const cursor = donateCollection.find();
-//   const result = await cursor.toArray();
-//   res.send(result);
-//   }); 
-  
-  
-  
-  
-   
-  
-  
-  
-  
-  
-
-  
-//     app.post('/api/order', async(req, res) => {
-//       try {
-//           const orderData = req.body;
-//           console.log('Received order data:', orderData);
-  
-//           // Check if data is empty
-//           if (!orderData || Object.keys(orderData).length === 0) {
-//               return res.status(400).json({
-//                   success: false,
-//                   message: 'No order data provided'
-//               });
-//           }
-  
-//           // Remove any existing _id field from the order data
-//           const { _id, ...orderDataWithoutId } = orderData;
-  
-//           // Create a new order document
-//           const newOrder = {
-//               ...orderDataWithoutId,
-//               createdAt: new Date(),
-//               status: 'pending'
-//           };
-  
-//           // Check database connection
-//           if (!orderCollection) {
-//               throw new Error('Database collection not initialized');
-//           }
-  
-//           const result = await orderCollection.insertOne(newOrder);
-//           console.log('Insert result:', result);
-  
-//           if (result.acknowledged) {
-//               res.status(201).json({
-//                   success: true,
-//                   message: 'Order created successfully',
-//                   orderId: result.insertedId,
-//                   data: newOrder
-//               });
-//           } else {
-//               throw new Error('Order creation failed');
-//           }
-  
-//       } catch (error) {
-//           console.error('Order creation error:', error);
-//           res.status(500).json({
-//               success: false,
-//               message: 'Failed to create order',
-//               error: error.message
-//           });
-//       }
-//   });
-  
-
-  
-  
-  
-  
       // Send a ping to confirm a successful connection
       //sawait client.db("admin").command({ ping: 1 });
       //console.log("Pinged your deployment. You successfully connected to MongoDB!");
