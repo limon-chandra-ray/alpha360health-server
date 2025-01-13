@@ -33,9 +33,20 @@ async function run() {
         const AppoinmentCollection = database.collection('Appoinments')
         const DrugCollection = database.collection("Drugs")
   
+        
+        //last patient id
+        app.get('/api/patient-id',async(req,res)=>{
+            const last_patient = await patientCollection.find()
+            .sort({ created_at: -1 }) // Sort by created_at in descending order
+            .limit(1) // Get the most recent document
+            .toArray();
+            res.json(last_patient[0])
+        })
+        
         //Patients add
         app.post('/api/patients',async(req,res)=>{
             const patients = req.body
+            patients.created_at = new Date();
             const result = await patientCollection.insertOne(patients)
             res.send(result)
         })
@@ -96,6 +107,8 @@ async function run() {
                           service_charge: 1,
                           appoinment_status: 1,
                           patient_type: 1,
+                          prescription_id: 1,
+                          created_at: 1,
                           patientId:"$patient_details.patient_id",
                           patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
                           phone_number: "$patient_details.phone_number"  // Adjust as needed
@@ -150,6 +163,8 @@ async function run() {
                             service_charge: 1,
                             appoinment_status: 1,
                             patient_type: 1,
+                            prescription_id: 1,
+                            created_at: 1,
                             patientId:"$patient_details.patient_id",
                             patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
                             phone_number: "$patient_details.phone_number" ,
