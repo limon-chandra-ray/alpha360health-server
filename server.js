@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 
 //mongodb
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 
 const port = 5000;
 
@@ -46,11 +46,155 @@ async function run() {
           })
         // appoinment add
         app.post("/api/appoinments",async(req,res)=>{
-            const appoinment = req.body;
-            const result = await AppoinmentCollection.insertOne(appoinment);
+            const appoinnment = req.body;
+            const result = await AppoinmentCollection.insertOne(appoinnment);
             res.send(result)
         })
-    
+        app.get('/api/appoinments',async(req,res)=>{
+            try{
+                // Extract the query parameter for filtering
+                const { appoinment_status } = req.query;
+
+                // Build the match filter dynamically
+                const matchStage = {
+                    $match: appoinment_status ? { appoinment_status } : {}
+                };
+   
+                const result=await AppoinmentCollection.aggregate([
+                    matchStage,
+                    {
+                        $addFields: {
+                            patient_pid: { $toObjectId: "$patient_pid" } // Convert patient_pid to ObjectId if it's a string
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'patients',
+                            localField: 'patient_pid',
+                            foreignField: '_id',
+                            as: 'patient_details',
+                        }
+                    },
+                    {
+                        $unwind: "$patient_details"  // Flatten the array of patient details
+                      },
+                      {
+                        $project: {
+                          _id: 1,
+                          patient_pid: 1,
+                          chief_complaint: 1,
+                          payment_status: 1,
+                          service_charge: 1,
+                          appoinment_status: 1,
+                          patient_type: 1,
+                          patientId:"$patient_details.patient_id",
+                          patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
+                          phone_number: "$patient_details.phone_number"  // Adjust as needed
+                        }
+                      }
+                    
+                ]).toArray();
+                res.send(result);
+            }catch (error) {
+                console.error('Error fetching appointments:', error);
+                res.status(500).send({ error: 'An error occurred while fetching appointments' });
+            }
+            
+        })
+        app.get('/api/appoinments/:Id',async(req,res)=>{
+            try{
+                // Extract the query parameter for filtering
+                const { Id } = req.params;
+
+
+                // Validate the ID
+                if (!Id || !ObjectId.isValid(Id)) {
+                    return res.status(400).send({ error: 'Invalid appointment ID' });
+                }
+   
+                const result=await AppoinmentCollection.aggregate([
+                    {
+                        $match: { _id: new ObjectId(Id) } // Match the appointment by its ID
+                    },
+                    {
+                        $addFields: {
+                            patient_pid: { $toObjectId: "$patient_pid" } // Convert patient_pid to ObjectId if it's a string
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'patients',
+                            localField: 'patient_pid',
+                            foreignField: '_id',
+                            as: 'patient_details',
+                        }
+                    },
+                    {
+                        $unwind: "$patient_details"  // Flatten the array of patient details
+                      },
+                      {
+                        $project: {
+                            _id: 1,
+                            patient_pid: 1,
+                            chief_complaint: 1,
+                            payment_status: 1,
+                            service_charge: 1,
+                            appoinment_status: 1,
+                            patient_type: 1,
+                            patientId:"$patient_details.patient_id",
+                            patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
+                            phone_number: "$patient_details.phone_number" ,
+                            address:"$patient_details.address",
+                            complaint:1,
+                            advice:1,
+                            diagnosi:1,
+                            instruction:1,
+                            medicins:1,
+                            observation:1
+                        }
+                      }
+                    
+                ]).toArray();
+                res.send(result);
+            }catch (error) {
+                console.error('Error fetching appointments:', error);
+                res.status(500).send({ error: 'An error occurred while fetching appointments' });
+            }
+            
+        })
+
+        app.patch('/api/appoinments/:id', async (req, res) => {
+            try {
+                // Extract the appointment ID from the request parameters
+                const { id } = req.params;
+        
+                // Extract the fields to update from the request body
+                const updateData = req.body;
+        
+                // Validate the ID format
+                if (!id || !ObjectId.isValid(id)) {
+                    return res.status(400).send({ error: 'Invalid appointment ID' });
+                }
+        
+                // Perform the update operation
+                const result = await AppoinmentCollection.updateOne(
+                    { _id: new ObjectId(id) }, // Filter by appointment ID
+                    { $set: updateData } // Update only the provided fields
+                );
+        
+                // Check if the document was updated
+                if (result.matchedCount === 0) {
+                    return res.status(404).send({ error: 'Appointment not found' });
+                }
+        
+                // Return a success response
+                res.send({ message: 'Appointment updated successfully', result });
+            } catch (error) {
+                console.error('Error updating appointment:', error);
+                res.status(500).send({ error: 'An error occurred while updating the appointment' });
+            }
+        });
+
       // Send a ping to confirm a successful connection
       //sawait client.db("admin").command({ ping: 1 });
       //console.log("Pinged your deployment. You successfully connected to MongoDB!");
