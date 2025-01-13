@@ -47,6 +47,15 @@ async function run() {
         // appoinment add
         app.post("/api/appoinments",async(req,res)=>{
             const appoinnment = req.body;
+            appoinnment.created_at = new Date();
+
+            const lastAppointment = await AppoinmentCollection.find()
+            .sort({ created_at: -1 }) // Sort by created_at in descending order
+            .limit(1) // Get the most recent document
+            .toArray();
+            const appoinment_object = lastAppointment[0]
+            appoinnment.prescription_id = appoinment_object.prescription_id? parseInt(appoinment_object.prescription_id) + 1 : 10000001
+            console.log("Last appoinment",lastAppointment)
             const result = await AppoinmentCollection.insertOne(appoinnment);
             res.send(result)
         })
