@@ -31,7 +31,7 @@ async function run() {
         const database = client.db('alphaconsultaion');
         const patientCollection = database.collection('patients')
         const AppoinmentCollection = database.collection('Appoinments')
-
+        const DrugCollection = database.collection("Drugs")
   
         //Patients add
         app.post('/api/patients',async(req,res)=>{
@@ -194,6 +194,45 @@ async function run() {
                 res.status(500).send({ error: 'An error occurred while updating the appointment' });
             }
         });
+
+        //DrugData set post
+        app.post('/api/drugs',async(req,res)=>{
+            const drug_list = req.body
+            const result = await DrugCollection.insertMany(drug_list)
+            res.send(result)
+        })
+
+        //Drug searching
+        app.get('/api/search-drugs', async (req, res) => {
+            try {
+                const { search } = req.query;
+                // Validate if the search query is provided
+                if (!search || search.trim() === "") {
+                    return res.status(400).json({ error: "Search query is required" });
+                }
+        
+                const fields = ["brand_name", "generic_name"];
+
+                const query = {
+                    $or: fields.map(field => ({
+                        [field]: { $regex: `^${search.trim()}`, $options: "i" }
+                    }))
+                };
+                // Search for drugs using regex
+                const result = await DrugCollection.find(
+                    query 
+                )
+                .limit(10)
+                .toArray();
+        
+                // Send the results back as JSON
+                res.json(result);
+            } catch (error) {
+                console.error('Error while searching drugs:', error);
+                res.status(500).json({ error: 'An error occurred while searching drugs' });
+            }
+        });
+
 
       // Send a ping to confirm a successful connection
       //sawait client.db("admin").command({ ping: 1 });
