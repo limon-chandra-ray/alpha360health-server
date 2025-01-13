@@ -188,6 +188,31 @@ async function run() {
             }
             
         })
+        app.delete('/api/appoinments/:Id',async(req,res)=>{
+            try {
+                // Extract the appointment ID from the request parameters
+                const { Id } = req.params;
+        
+                // Validate the ID format
+                if (!Id || !ObjectId.isValid(Id)) {
+                    return res.status(400).json({ error: 'Invalid appointment ID' });
+                }
+        
+                // Delete the appointment from the collection
+                const result = await AppoinmentCollection.deleteOne({ _id: new ObjectId(Id) });
+        
+                // Check if the document was found and deleted
+                if (result.deletedCount === 0) {
+                    return res.status(404).json({ error: 'Appointment not found' });
+                }
+        
+                // Respond with success
+                res.json({ message: 'Appointment deleted successfully', result });
+            } catch (error) {
+                console.error('Error deleting appointment:', error);
+                res.status(500).json({ error: 'An error occurred while deleting the appointment' });
+            }
+        })
 
         app.patch('/api/appoinments/:id', async (req, res) => {
             try {
