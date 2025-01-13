@@ -145,6 +145,8 @@ async function run() {
                             patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
                             phone_number: "$patient_details.phone_number" ,
                             address:"$patient_details.address",
+                            gender:"$patient_details.gender",
+                            age:"$patient_details.age",
                             complaint:1,
                             advice:1,
                             diagnosi:1,
