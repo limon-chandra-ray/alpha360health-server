@@ -73,13 +73,14 @@ async function run() {
         app.get('/api/appoinments',async(req,res)=>{
             try{
                 // Extract the query parameter for filtering
-                const { appoinment_status, agent_email } = req.query;
+                const { appoinment_status, agent_email, doctor_name } = req.query;
 
                 
                 const matchStage = { $match: {} };
 
                 if (appoinment_status) matchStage.$match.appoinment_status = appoinment_status;
                 if (agent_email) matchStage.$match.agent_email = agent_email;
+                if (doctor_name) matchStage.$match.doctor_name = doctor_name;
                 
                 const result=await AppoinmentCollection.aggregate([
                     matchStage,
