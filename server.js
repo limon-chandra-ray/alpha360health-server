@@ -109,6 +109,8 @@ async function run() {
                           patient_type: 1,
                           prescription_id: 1,
                           created_at: 1,
+                          agent_email:1,
+                          doctor_name:1,
                           patientId:"$patient_details.patient_id",
                           patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
                           phone_number: "$patient_details.phone_number"  // Adjust as needed
@@ -165,6 +167,8 @@ async function run() {
                             patient_type: 1,
                             prescription_id: 1,
                             created_at: 1,
+                            agent_email:1,
+                            doctor_name:1,
                             patientId:"$patient_details.patient_id",
                             patient_name: "$patient_details.patient_name",  // Adjust the patient details as per your patient collection
                             phone_number: "$patient_details.phone_number" ,
